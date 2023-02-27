@@ -1,0 +1,66 @@
+.l__account
+  .l__l
+    = render 'users/is_image', user: @user
+  
+  .l__r
+    - if is_signin
+      - if is_signed(current_user.id, @user.id)
+        .l__edit
+          =link_to 'プロフィール編集', edit_user_registration_path, class: "edit__profileButton"
+          %span.edit__settingButton.js__subMemu 管理メニュー
+
+
+    %h2
+      #{@user.name}
+    
+      - if is_identity?(@user)
+        = render "users/identity"
+
+    -# .socaial_area
+    -#   - if is_signin && is_signed(current_user.id, @user.id)
+    -#     - if @user.social_profiles.empty?
+    -#       = link_to omniauth_authorize_path(:user, :twitter), class: "social_twitter_still" do
+    -#         %img{:src => "#{asset_path "Twitter_Icon_Rounded_Square_Still.svg"}"}
+    -#         %span 連携されていません
+    -#     - else
+    -#       = link_to disconnect_path, class: "social_twitter_already", :method => :delete do
+    -#         %img{:src => "#{asset_path "Twitter_Icon_Rounded_Square_Already.svg"}"}
+    -#         %span 連携を解除する
+    -#   - else
+    -#     - unless @user.social_profiles.empty?
+    -#       = link_to @user.social_profiles[0].url, class: "social_twitter_already", :target=>["_blank"] do
+    -#         %img{:src => "#{asset_path "Twitter_Icon_Rounded_Square_Already.svg"}"}
+    -#         %span @#{@user.social_profiles[0].nickname}
+
+    = render 'follow_form', user: @user if user_signed_in?
+
+    
+    .description
+      -if @user.user_profile.description.try(:split, "\n").nil?
+        = text_url_to_link(@user.user_profile.description).html_safe
+      -else
+        = text_url_to_link(safe_join(@user.user_profile.description.split("\n"), tag(:br))).html_safe
+
+    = render 'layouts/tag_list', tag_list: @user.tag_list
+
+    .numbers
+      %h3
+        = "#{@follower}"
+        %span フォロワー
+
+- if is_signin && is_signed(current_user.id, @user.id)
+  .bg__w
+    %ul.l__profile__tab
+      %li{ class: controller.action_name == 'playlist' ? 'active' : '' }
+        = link_to "プレイリスト", users_playlist_path(current_user)
+      %li{ class: controller.action_name == 'purchasehistory' ? 'active' : '' }
+        = link_to "購入履歴", users_purchasehistory_path(current_user)
+      %li{ class: controller.action_name == 'favuser' ? 'active' : '' }
+        = link_to "フォロー中", users_favuser_path(@user)
+      %li{ class: controller.action_name == 'favplaylist' ? 'active' : '' }
+        = link_to "お気に入り", users_favplaylist_path(current_user)
+- else
+  .bg__w
+    %ul.l__profile__tab
+      %li{ class: controller.action_name == 'playlist' ? 'active' : '' }
+        = link_to "プレイリスト", users_playlist_path(@user)

@@ -1,0 +1,65 @@
+- set_meta_tags title: "決済設定"
+
+.l__payment
+  %h2 決済設定
+
+  .l__disc
+    .paymentContentHeader
+      %p.detail
+        売上金の入金やクレジットカードによる支払いを受け付けるためにStripeアカウントと連携します。 詳しい設定方法は
+        %a{href: "https://help.starlistz.com/81stripe%e9%80%a3%e6%90%ba%e6%96%b9%e6%b3%95/", target: "_blank"} こちら
+        をご覧ください。
+      %a.helplink{href: "https://help.starlistz.com/91stripe%e3%81%a8%e3%81%af%ef%bc%9f/", target: "_blank"} Stripeとは？
+
+
+    %h3 Stripeとの連携
+    %hr
+    
+    - if @stripe_email.nil?
+      .l__btn
+        = link_to "「Stripe」アカウントを作成/連携する", stripe_url_header(current_user) ,class: "btn"
+        
+      .l__stripeinfo.failed
+        %h4 連携中Stripeアカウント情報
+  
+        %table
+          %tbody
+            %tr
+              %td メールアドレス
+              %td 未連携
+            %tr
+              %td プレイリスト公開状況
+              %td.state 非公開
+    
+    -else
+      
+      .l__btn
+        = link_to "「Stripe」アカウントを連携し直す", stripe_url_header(current_user) ,class: "btn"
+        
+      .l__stripeinfo.success
+        %h4 連携中Stripeアカウント情報
+        .pull__right
+          %p Stripe
+          = link_to "ダッシュボードへ", "https://dashboard.stripe.com/dashboard", target: "_blank"
+          
+        %table
+          %tbody
+            %tr
+              %td メールアドレス
+              %td= @stripe_email
+            %tr
+              %td プレイリスト公開状況
+              %td.state 公開中
+    
+    .l__innertext
+      %p プレイリストを公開するにはStripeとの連携が必要です。
+      %p.attention ※StarListzとStripeアカウントを連携させなければ収益の受け取りが出来ないため、作成したプレイリストは非公開となります。
+      %p 上の「決済代行サービス「Stripe」アカウントを作成/連携する」からStripeのアカウントを作成します。あるいはすでにお持ちのStripeアカウントと連携させます。
+      %p Stripe連携を行いStarListzでプレイリストを公開しましょう！
+
+      %img{:src => "/images/visa.png"}
+      %img{:src => "/images/mastercard.png"}
+      %img{:src => "/images/americanExpress.png"}
+
+    
+    

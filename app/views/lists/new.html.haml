@@ -1,0 +1,47 @@
+- set_meta_tags title: "プレイリストの新規作成"
+
+- if @list.errors.any?
+  #error_explanation.alert.alert-danger
+    %ul
+      - @list.errors.full_messages.each do |message|
+        %li= message
+
+.l__listShow.l__listEdit
+  = simple_form_for @list do |f|
+    .l__playlist
+      .l__playlistCore.clearfix
+          
+        .playlist__text
+          .playlist__title
+            = f.input :title, label: "プレイリスト名", placeholder: 'プレイリスト名（必須５０文字まで）'
+          .list_mood
+            = f.label :playlist_mood do
+              ムード
+              %span.form-require 必須
+            = f.text_field :tag_list, value: f.object.tag_list.to_s, placeholder: '気分（#ワークアウト #チル #ドライブ...）'
+          .span.playlist__price
+            = f.label :price do
+              価格
+              %span.form-require 必須
+            .price-input
+              ￥
+              = f.input :price, label: false, required: false, error: false, placeholder: '例）100', as: :string
+              
+      .span.playlist__discription
+        = f.label :description do
+          プレイリスト説明
+          %span.form-require 必須
+        = f.input :description, label: false, placeholder: 'プレイリストの説明（3000文字以内）', :input_html => {:rows => 5}
+    
+    = render partial: 'icon_desc'
+
+    #track_section.table-sortable
+      = f.fields_for :tracks, @list.tracks.sort_by(&:row_order) do |track|
+        = render 'track_fields', f: track
+          
+    .field_track_add
+      = link_to_add_association '曲追加', f, :tracks,:"data-association-insertion-node" => "#track_section",:"data-association-insertion-method" => "append"
+
+    .actions
+      = f.submit "作成"
+      

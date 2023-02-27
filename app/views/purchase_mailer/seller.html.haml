@@ -1,0 +1,28 @@
+%p StarListzをご利用いただき、ありがとうございます。
+%p プレイリストが購入されました。
+%p 詳細は以下のとおりです。
+%br/
+%br/
+%p --------------------------------------------------------------------------------
+%br/
+%br/
+%p ご注文ID： #{@purchase.uid}
+%p 日付： #{@purchase.order_date.strftime("%Y月%m月%d日")}
+%p プレイリスト名： #{@purchase.list.title}
+%p 金額： ￥#{@purchase.list.price}
+%p 決済方法： クレジットカード
+%br/
+%br/
+%br/
+%p --------------------------------------------------------------------------------
+%br/
+お問い合わせ
+%br/
+%p= Constants::SUPPORT_MAIL
+%br/
+%p= link_to "配信停止はこちら", mail_notice_url
+%br/
+StarListz
+%br/
+%p= Constants::HP_URL
+%br/

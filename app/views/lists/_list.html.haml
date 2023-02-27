@@ -1,0 +1,58 @@
+%ul.card
+  - lists.each_with_index do |list, i|
+    %li
+      - if is_purchase?(current_user, list) 
+        //purchased
+        .l__upper
+          .l__img
+            = render 'users/is_image', user: list.user
+          %span.listtitle= link_to trun_str(list.title, 21), list_path(list) , class: "testclass"
+          %span.author= link_to trun_str(list.user.name, 23), users_playlist_path(list.user)
+        .l__bottom
+          %p= trun_str(list.description, 40)
+          .tags
+            - list.tag_list.each.with_index(0) do |listmood, i|
+              - if i > 4
+                %span.genretag･･･
+                - break
+              - else
+                %span.genretag
+                  = link_to trun_str(listmood, 30), chart_path(mood: listmood, sort: Constants::SORT)
+            .l__footerPrice
+              //playlist favorite
+              %span.favoriteStar
+                %i.material-icons star_rate
+                = list.list_favorites.count
+              %span.label.label-warning 購入済み
+              %span.listprice ¥#{list.price}
+      
+      - else
+        //not purchased
+        = link_to list_path(list) do
+          .l__upper
+            .l__img
+              = render 'users/is_image', user: list.user
+
+            -if is_signin && is_signed(current_user.id, list.user.id)
+              - if !is_release_list?(list)
+                %span.liststatus 非公開
+            %span.listtitle= trun_str(list.title, 21)
+            %span.author= trun_str(list.user.name, 23)
+          .l__bottom
+            %p= trun_str(list.description, 40)
+            .tags
+              - list.tag_list.each.with_index(0) do |listmood, i|
+                - if i > 4
+                  %span.genretag･･･
+                  - break
+                - else
+                  %span.genretag
+                    = trun_str(listmood, 30)
+            .l__footerPrice
+              %span.favoriteStar
+                %i.material-icons star_rate
+                = list.list_favorites.count
+              -if is_signin && is_signed(current_user.id, list.user.id)
+                %span.label.label-default My Playlist
+              %span.listprice ¥#{list.price}
+

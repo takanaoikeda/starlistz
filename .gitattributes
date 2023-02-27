@@ -1,0 +1,4 @@
+public/* linguist-vendored  
+app/assets/* linguist-vendored  
+*.html.haml linguist-language=Ruby
+*.rb linguist-language=Ruby

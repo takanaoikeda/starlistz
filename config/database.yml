@@ -1,0 +1,63 @@
+# SQLite version 3.x
+#   gem install sqlite3
+#
+#   Ensure the SQLite 3 gem is defined in your Gemfile
+#   gem 'sqlite3'
+#
+default: &default
+  adapter: mysql2
+  encoding: utf8
+  reconnect: false
+  database: starlistz_dev
+  pool: 5
+  username: local_user
+  password: "stardev"
+  host: localhost
+  variables:
+    sql_mode: TRADITIONAL
+
+development:
+  <<: *default
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+
+# heroku development環境
+test:
+  adapter: mysql2
+  encoding: utf8
+  reconnect: false
+  pool: 5
+  database: <%= ENV['DB_NAME'] %>
+  username: <%= ENV['DB_USERNAME'] %>
+  password: <%= ENV['DB_PASSWORD'] %>
+  host:     <%= ENV['DB_HOSTNAME'] %>
+  variables:
+    sql_mode: TRADITIONAL
+    
+# heroku staging環境
+staging:
+  adapter: mysql2
+  encoding: utf8
+  reconnect: false
+  pool: 5
+  database: <%= ENV['DB_NAME'] %>
+  username: <%= ENV['DB_USERNAME'] %>
+  password: <%= ENV['DB_PASSWORD'] %>
+  host:     <%= ENV['DB_HOSTNAME'] %>
+  variables:
+    sql_mode: TRADITIONAL
+
+# heroku production環境
+production:
+  adapter: mysql2
+  encoding: utf8
+  reconnect: false
+  pool: 5
+  database: <%= ENV['DB_NAME'] %>
+  username: <%= ENV['DB_USERNAME'] %>
+  password: <%= ENV['DB_PASSWORD'] %>
+  host:     <%= ENV['DB_HOSTNAME'] %>
+  variables:
+    sql_mode: TRADITIONAL

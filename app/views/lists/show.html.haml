@@ -1,0 +1,203 @@
+- if @user.user_profile.avatar.file.nil?
+  - set_meta_tags og:{ title: @list.title, description: @list.description, image: image_url("/default/thumb_noavatar.jpg") } 
+- else
+  - set_meta_tags og:{ title: @list.title, description: @list.description, image: image_url(@user.user_profile.avatar.thumb.to_s ) } 
+
+
+
+
+// 購入ボタンのモーダルウィンドウ　紐づけ用
+- i = 1
+
+.l__listShow.l__s
+  .l__playlist
+    -if is_signin && is_signed(current_user.id, @list.user.id)
+      .playlist__editLink
+        = link_to edit_list_path(@list), { class: "edit_link" } do
+          = button_tag :type => "button", :class =>"btn btn__favorite__square" do
+            %i.material-icons edit
+            プレイリストを編集
+            
+      -if !is_release_list?(@list)
+        %span.liststatus 非公開
+      
+    .l__playlistCore.clearfix
+      .playlist__topimg
+        .l__img
+          = render 'users/is_image', user: @user
+        .span.trackCount #{@list.tracks.count}曲
+      
+      .playlist__text
+        .playlist__title
+          - if @list.paranoia_destroyed?
+            = @list.title + Constants::DLETE_MARK_LIST
+          - else
+            = @list.title
+        
+        .playlist__author
+          - if @list.user.paranoia_destroyed?
+            #{@list.user.name + Constants::DLETE_MARK_USER}
+          - else
+            = link_to @list.user.name, users_playlist_path(@list.user)
+            // 本人確認バッジ
+            - if is_identity?(@list.user)
+              = render "users/identity"
+            
+        -unless @list.paranoia_destroyed?
+          - if @display_list == true
+            -unless is_signin && is_signed(current_user.id, @list.user.id)
+              = render 'lists/fav_form', list: @list 
+          - elsif is_release_list?(@list)
+            = form_tag charges_path do
+              .l__btn__purchase
+                %label.amount
+                .datafield
+                  = hidden_field_tag :list, @list.id
+                  
+                // 購入前のログイン判定用
+                -# %button.btn__purchase.buy_btn{type: "button"} 購入する
+                = button_to '購入する', {controller: 'charges', action: 'show'}, method: :post, class: "btn__purchase buy_btn"
+              
+              // Stripe決済部分
+              -# .hide_checkout
+              -#   - if @customer.nil?
+              -#     %script.stripe-button{"data-amount" => "#{@list.price}",
+              -#       "data-description" => "#{@list.title}",
+              -#       "data-email" => "",
+              -#       "data-key" => "#{Rails.configuration.stripe[:publishable_key]}",
+              -#       "data-label" => "購入",
+              -#       "data-locale" => "auto",
+              -#       "data-currency" => "jpy",
+              -#       "data-name" => "StarListz",
+              -#       "data-panel-label" => "プレイリストを購入",
+              -#       :src => "https://checkout.stripe.com/checkout.js"}
+              -#   - else
+              -#     %script.stripe-button{"data-amount" => "#{@list.price}",
+              -#       "data-description" => "#{@list.title}",
+              -#       "data-email" => "#{@customer.email}",
+              -#       "data-key" => "#{Rails.configuration.stripe[:publishable_key]}",
+              -#       "data-label" => "購入",
+              -#       "data-locale" => "auto",
+              -#       "data-currency" => "jpy",
+              -#       "data-name" => "StarListz",
+              -#       "data-panel-label" => "プレイリストを購入",
+              -#       :src => "https://checkout.stripe.com/checkout.js"}
+
+          .span.playlist__price ￥#{@list.price}
+    -if @list.description.length >= 140
+      -if @list.description.try(:split, "\n").nil?
+        .span.playlist__discription
+          .grad-wrap
+            %input#trigger1.grad-trigger{:type => "checkbox"}/
+            %label.grad-btn{:for => "trigger1"}
+              %i.material-icons keyboard_arrow_down
+            .grad-item
+              = text_url_to_link(@list.description).html_safe
+      -else
+        .span.playlist__discription
+          .grad-wrap
+            %input#trigger1.grad-trigger{:type => "checkbox"}/
+            %label.grad-btn{:for => "trigger1"}
+              %i.material-icons keyboard_arrow_down
+            .grad-item
+              = text_url_to_link(safe_join(@list.description.split("\n"), tag(:br))).html_safe
+
+    -else
+      -if @list.description.try(:split, "\n").nil?
+        .span.playlist__discription= text_url_to_link(@list.description).html_safe
+      -else
+        .span.playlist__discription= text_url_to_link(safe_join(@list.description.split("\n"), tag(:br))).html_safe
+      
+    
+    
+    .span
+      - @list.tag_list.each.with_index(0) do |listmood, i|
+        %span.genretag
+          = link_to listmood, chart_path(mood: listmood, sort: Constants::SORT)
+  
+  - if @display_list == true
+    .track_section
+      #cont_desc_show.l__tracks
+        %table
+          %tbody
+            %tr
+              %td
+                %span.favoriteStar
+                  おすすめ
+              %td.track_no_sample
+              %td
+                %span.trackSong 曲名
+                %span.trackArtist アーティスト名
+              %td
+                %span.trackComment
+                  曲への気持ち
+                  
+
+      - @list.tracks.sort_by(&:row_order).each_with_index do |track, i|
+        .l__tracks
+          %table
+            %tbody
+              %tr
+                %td
+                  - if track.recommend == true
+                    %span.favoriteStar
+                      %i.material-icons star_rate
+                %td.track_no
+                %td
+                  %span.trackSong= track.song
+                  %span.trackArtist= track.artist
+                %td
+                  - if track.description != nil && track.description.length > 0
+                    %a.modal-syncer.js__listBack.trackComment{"data-target" => "modal-content-#{i}"} 
+                      %img{:src => "#{asset_path "chat.png"}", :width => "24", :height => "24"} 
+
+
+        .modal-content.modal__comment{:id => "modal-content-#{i}"}
+          // モーダルウィンドウのコンテンツ開始
+          .r__modalContent
+          .l__playlistCore.clearfix
+            .playlist__img
+              .l__img
+                = render 'users/is_image', user: @user
+            .playlist__text
+              %span.modal_song= track.song
+              %span.modal_artist= track.artist
+          %hr
+          .playlist__song_description
+            -if track.description.try(:split, "\n").nil?
+              %p= text_url_to_link(track.description).html_safe
+            -else
+              %p= text_url_to_link(safe_join(track.description.split("\n"), tag(:br))).html_safe
+
+          #tool-btn.clear
+            %a.clipbtn.btn1{:href => "#"} 
+              %i.material-icons
+                file_copy
+              曲名、アーティスト名をコピー
+            %a.btn2{href: "#{"https://www.youtube.com/results?search_query=" + track.artist + " " + track.song}", target: "_blank"}
+              %span
+                %img{:src => "/images/yt_icon_rgb.png"}
+              曲をYouTubeで検索
+
+          // モーダルウィンドウのコンテンツ終了
+          %p.text-center
+            %a#modal-close.button-link 閉じる
+
+-# - if @display_list == true && !is_signed(current_user.id, @list.user.id)
+-#   .it-Footer_social
+-#     .SocialMediaShareButton.SocialMediaShareButton--twitter{:role => "button", :style => "margin-right: 0px; margin-top: 0px;", :tabindex => "0"}
+-#       %div{:style => "width: 32px; height: 32px;"}
+-#         %svg.social-icon.social-icon--twitter{:fill => "white", :height => "32", :viewbox => "0 0 64 64", :width => "32"}
+-#           %g
+-#             %circle{:cx => "32", :cy => "32", :fill => "#00aced", :r => "31"}
+-#           %g
+-#             %path{:d => "M48,22.1c-1.2,0.5-2.4,0.9-3.8,1c1.4-0.8,2.4-2.1,2.9-3.6c-1.3,0.8-2.7,1.3-4.2,1.6 C41.7,19.8,40,19,38.2,19c-3.6,0-6.6,2.9-6.6,6.6c0,0.5,0.1,1,0.2,1.5c-5.5-0.3-10.3-2.9-13.5-6.9c-0.6,1-0.9,2.1-0.9,3.3 c0,2.3,1.2,4.3,2.9,5.5c-1.1,0-2.1-0.3-3-0.8c0,0,0,0.1,0,0.1c0,3.2,2.3,5.8,5.3,6.4c-0.6,0.1-1.1,0.2-1.7,0.2c-0.4,0-0.8,0-1.2-0.1 c0.8,2.6,3.3,4.5,6.1,4.6c-2.2,1.8-5.1,2.8-8.2,2.8c-0.5,0-1.1,0-1.6-0.1c2.9,1.9,6.4,2.9,10.1,2.9c12.1,0,18.7-10,18.7-18.7 c0-0.3,0-0.6,0-0.8C46,24.5,47.1,23.4,48,22.1z"}
+
+-#     .SocialMediaShareButton.SocialMediaShareButton--facebook{:role => "button", :style => "margin-right: 30px; margin-top: 0px;", :tabindex => "0"}
+-#       %div{:style => "width: 32px; height: 32px;"}
+-#         %svg.social-icon.social-icon--facebook{:fill => "white", :height => "32", :viewbox => "0 0 64 64", :width => "32"}
+-#           %g
+-#             %circle{:cx => "32", :cy => "32", :fill => "#3b5998", :r => "31"}
+-#           %g
+-#             %path{:d => "M34.1,47V33.3h4.6l0.7-5.3h-5.3v-3.4c0-1.5,0.4-2.6,2.6-2.6l2.8,0v-4.8c-0.5-0.1-2.2-0.2-4.1-0.2 c-4.1,0-6.9,2.5-6.9,7V28H24v5.3h4.6V47H34.1z"}
+      

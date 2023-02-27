@@ -1,0 +1,12 @@
+.l__new__sessions
+  .inform
+    = simple_form_for(resource, as: resource_name, url: session_path(resource_name)) do |f|
+      .form-group
+        = f.input :email, required: false, autofocus: true
+      .form-group
+        = f.input :password, required: false
+      .form-group
+        = f.input :remember_me, as: :boolean if devise_mapping.rememberable?
+      .form-actions
+        = f.button :submit, "ログイン"
+      = render "devise/shared/links"

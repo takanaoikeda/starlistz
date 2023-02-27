@@ -1,0 +1,100 @@
+- set_meta_tags title: "ホーム"
+
+
+
+
+- if !user_signed_in?
+  %section#banner
+    %ul.slider
+      - if !@recommend_list.nil?
+        %li.banner2
+          = link_to list_path(@recommend_list) do
+            .inner
+      %li.banner1
+        .inner
+          %h2 
+            音楽の新しい楽しみ方
+            
+          %footer
+            = link_to "新規登録する", new_user_registration_path,{ class: "button" }
+      
+          
+    
+
+- else
+  %section#banner.signed
+    %ul.slider
+      - if !@recommend_list.nil?
+        %li.banner2
+          = link_to list_path(@recommend_list) do
+            .inner
+      %li.banner1
+        .inner
+          %h2 
+            音楽の新しい楽しみ方
+            
+          %footer
+            %p.button.noButton ベータ版
+
+- if user_signed_in?
+  .top__playlist
+    %h2 NEWプレイリスト
+    = render "lists/list", lists: @newlists, customer: @customer
+
+  .top__user
+    %h2.top__title NEWユーザー
+    - if @newusers != nil and not @newusers.empty?
+      = render "users/user", users: @newusers
+  
+  
+
+- else
+
+  %section.top__copy
+    %h2 StarListzとは？
+    %p 曲への気持ち、聴く理由にフォーカスしたプレイリストを売り買いできるサービスです。
+  
+  
+  %section.top__discription
+    .l__discription
+      .l__block
+        %img.l__l{:src => "/images/tp-scene-private.jpg"}
+        .l__r
+          %h2 １曲の価値って？
+          %p その曲を聴く最高のシチュエーション、
+          %p まつわるエピソード、思い入れ等があるはず。
+          %p 聞き慣れた曲の新しい一面が知れるかも？
+        
+    .l__discription
+      .l__block
+        %img.l__l{:src => "/images/tp-scene-funn.jpg"}
+        .l__r
+          %h2 音楽の聴き方が変わる
+          %p 知っていても今まで聴いてこなかった曲
+          %p それは誰かの大切な曲かもしれません。
+          %p 今まで知らなかった音楽の新しい楽しみ方
+          %p を体験しませんか？
+  
+  %section.top__newRegist
+    %h2 音楽の楽しみ方を変えましょう
+    %footer
+      = link_to "新規登録する", new_user_registration_path,{ class: "button" }
+  
+  %section.top__question
+    %h2 よくある質問
+    .l__q
+      %p Q. 誰でもプレイリストを作成してもいいですか？
+    .l__a
+      %p A. はい。誰でも作成して大丈夫です。
+    .l__q
+      %p Q. プレイリストの曲は聞けますか？
+    .l__a
+      %p A. 現状は楽曲を再生することはできません。
+      %p 気になった曲があればお使いのストリーミングサービス等でチェックしてみてください。
+    .l__q
+      %p Q. 有料でプレイリストの公開は可能ですか？
+    .l__a
+      %p A. はい、プレイリストは100円～価格を設定できます。
+
+
+%script{:src => "https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"}
